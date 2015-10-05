@@ -1,0 +1,33 @@
+﻿@using Mail_WebArchiveView.Models;
+@model List<xCommissioner>
+
+@{
+    Layout = null;
+}
+
+<h2>City Commission Listing</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.Where(comm => comm.CurrentCommissioner.Contains("True") && !string.IsNullOrWhiteSpace(comm.Title) && comm.Title.Contains("Mayor")).OrderBy(comm => comm.Title).ThenBy(comm => comm.Name))
+{
+    string id = null;
+    id = (item.Mail).Split('@')[0];
+        
+    <li>
+    @Html.ActionLink(item.Name + " (" + item.Title + ") ", "Browse", "Archives", new { id=id, name=item.Name}, null)
+    </li>       
+
+}
+
+@foreach (var item in Model.Where(comm => comm.CurrentCommissioner.Contains("True") && !string.IsNullOrWhiteSpace(comm.Title) && !comm.Title.Contains("Mayor")).OrderBy(comm => comm.Title).ThenBy(comm => comm.Name))
+{
+    string id = null;
+    id = (item.Mail).Split('@')[0];
+        
+    <li>
+    @Html.ActionLink(item.Name + " (" + item.Title + ") ", "Browse", "Archives", new { id=id, name=item.Name}, null)
+    </li>       
+
+}
+</ul>

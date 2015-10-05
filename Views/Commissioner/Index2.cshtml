@@ -1,0 +1,160 @@
+﻿@using System.Web.Mvc.Html;
+@using PagedList.Mvc;
+@using Microsoft.Exchange.WebServices.Data;
+@using Mail_WebArchiveView.Models;
+@*@model PagedList.IPagedList<Microsoft.Exchange.WebServices.Data.Contact>*@
+@model List<Microsoft.Exchange.WebServices.Data.Contact>
+
+
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "City Commission Listing";
+}
+
+<h2>Mayor</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.Where(comm => !string.IsNullOrWhiteSpace(comm.JobTitle) && comm.JobTitle.Contains("Mayor")).OrderBy(comm => comm.DisplayName))
+{    
+    List<string> eads = new List<string>();
+    string email = null;
+    string id = null;
+    if(item.JobTitle.Contains("Mayor"))
+    {
+        if(item.EmailAddresses != null)
+        {
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress1))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress1].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress2))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress2].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress3))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress3].Address);
+            }
+        }
+        
+        foreach (string s in eads)   
+        {
+            if (s.StartsWith("SMTP:", StringComparison.CurrentCulture))
+            {
+                email = s.Split(':')[1];
+                id = email.Split('@')[0];
+            }
+                
+        }
+        
+        <li>
+        @Html.ActionLink(item.DisplayName, "Browse", "Archives", new { id=id, name=item.DisplayName}, null)
+        </li>    
+        break;   
+    }
+}
+</ul>
+
+<h2>City Commission Listing</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.Where(comm => !string.IsNullOrWhiteSpace(comm.JobTitle) && !comm.JobTitle.Contains("Mayor") && !comm.JobTitle.Contains("Term")).OrderBy(comm => comm.JobTitle).ThenBy(comm => comm.DisplayName))
+{
+    List<string> eads = new List<string>();
+    string email = null;
+    string id = null;
+    
+        if (item.EmailAddresses != null)
+        {
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress1))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress1].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress2))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress2].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress3))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress3].Address);
+            }
+        }
+
+        foreach (string s in eads)
+        {
+            if (s.StartsWith("SMTP:", StringComparison.CurrentCulture))
+            {
+                email = s.Split(':')[1];
+                id = email.Split('@')[0];
+            }
+
+        }  
+        <li>
+        @Html.ActionLink(item.DisplayName + " (" + item.JobTitle + ") ", "Browse", "Archives", new { id=id, name=item.DisplayName}, null)
+        </li>       
+
+}
+</ul>
+
+@if((Model.Where(comm => comm.JobTitle.Contains("Term"))).Count() > 0)
+{
+<h2>Previous Commissioners</h2>
+<ul>
+@foreach (var item in Model.Where(comm => !string.IsNullOrWhiteSpace(comm.JobTitle) && comm.JobTitle.Contains("Term")).OrderBy(comm => comm.DisplayName))
+{
+    List<string> eads = new List<string>();
+    
+    string email = null;
+    string id = null;
+    
+    //if(!item.JobTitle.Contains("Mayor") && !string.IsNullOrWhiteSpace(item.JobTitle))
+    //{
+        if (item.EmailAddresses != null)
+        {
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress1))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress1].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress2))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress2].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress3))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress3].Address);
+            }
+        }
+
+        foreach (string s in eads)
+        {
+            if (s.StartsWith("SMTP:", StringComparison.CurrentCulture))
+            {
+                email = s.Split(':')[1];
+                id = email.Split('@')[0];
+            }
+
+        }  
+        <li>
+        @Html.ActionLink(item.DisplayName + " (" + item.JobTitle + ") ", "Browse", "Archives", new { id = id, name=item.DisplayName}, null) 
+        </li>       
+    //}
+}
+</ul>
+}
+<br />
+@*Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))*@

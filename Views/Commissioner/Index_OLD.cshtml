@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Commissioner Listing";
+}
+
+<h2>Commissioner Listing</h2>
+
+@model IEnumerable<Mail_WebArchiveView.Models.MailboxC> 
+
+<ul class="round">
+
+@foreach (var item in Model)
+{
+
+    <li>
+        @Html.DisplayFor(modelItem => item.DisplayName) (@Html.DisplayFor(modelItem => item.uid[1]))
+    </li>       
+    
+
+}
+
+</ul>

@@ -1,0 +1,47 @@
+﻿@using System.Web;
+@using System.Web.UI;
+@using System.Web.UI.WebControls;
+
+@using Mail_WebArchiveView.Models;
+@model List<xCommissioner>
+
+<div style="float:left;" id="cc">
+<label>Select mailboxes:</label>
+    @foreach (var item in Model.OrderBy(comm => comm.Name))
+    {
+        List<string> eads = new List<string>();
+        string email = null;
+        
+        if (item.EmailAddresses != null)
+        {
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress1))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress1].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress2))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress2].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress3))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress3].Address);
+            }
+        }
+
+        foreach (string s in eads)
+        {
+            if (s.StartsWith("SMTP:", StringComparison.CurrentCulture))
+            {
+                email = s.Split(':')[1];
+            }
+
+        }
+        <div class="cck">
+        <input type="checkbox" name="comm" value="@email">@Html.ActionLink(item.DisplayName, "Index", "Archive", new { email = email, name=item.DisplayName}, null)
+        </div>  
+
+    }
+    </div>

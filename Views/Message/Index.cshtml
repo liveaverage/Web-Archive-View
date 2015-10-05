@@ -1,0 +1,61 @@
+﻿@{
+    //Layout = "~/Views/Message/Msg.cshtml";
+    ViewBag.Title = "Messages for " + ViewBag.name;
+}
+
+
+@using System.Web.Mvc.Html;
+@model Microsoft.Exchange.WebServices.Data.EmailMessage
+
+@section scripts{
+
+<script type="text/javascript">
+
+@*    $('#MsgBody').contents().find('html').html("<h1>Testing!</h1>");
+    $(document).ready(function () {
+        $('#MsgBody').contents().find('html').html(@Html.Raw(Model.Body.Text));
+    });*@
+
+</script>
+}
+
+<h2>@ViewBag.name : Message View</h2>
+
+<div style="float:right">
+@if (ViewBag.preview == false)
+{
+<a href="javascript:history.back()">Back to message results</a>@(" | ")
+}
+
+<a href="@Url.Action("GetMessageDL", "Message", new { mid = @Model.Id.ToString() })">Download Message (.eml)</a>
+</div>
+<table class="msgCol" style="width:100%">
+    <tr><td class="msgCol">Date Received:</td><td class="dataCol">@Html.DisplayFor(modelItem => Model.DateTimeReceived)</td></tr>
+    <tr><td class="msgCol">To:</td><td class="dataCol">@Model.DisplayTo</td></tr>
+    <tr><td class="msgCol">Cc:</td><td class="dataCol">@Model.DisplayCc</td></tr>
+    <tr><td class="msgCol">From:</td><td class="dataCol">@Html.DisplayFor(modelItem => Model.From.Name)</td></tr>
+    <tr><td class="msgCol">Subject:</td><td class="dataCol">@Html.DisplayFor(modelItem => Model.Subject)</td></tr>
+    <tr><td class="msgCol">Attachments:</td>
+    <td class="dataCol">
+
+        @foreach (var item2 in Model.Attachments)
+        {
+            <a href="@Url.Action("GetAttachment", "Message", new { aid = item2.Id.ToString(), attname = item2.Name, mid = @Model.Id.ToString() })">
+                @Html.DisplayFor(modelItem => item2.Name)
+                
+            </a>
+        }
+    </td>
+
+    </tr>
+    <tr><td class="msgCol">Message:</td>
+        <td class="dataCol">
+            <div class="content">
+            @Html.Raw(Model.Body.Text)
+            </div>
+        </td>
+
+    </tr>
+</table>
+
+

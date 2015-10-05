@@ -1,0 +1,283 @@
+﻿@using Microsoft.Exchange.WebServices.Data;
+@using Mail_WebArchiveView.Models;
+@using System.Web;
+@using System.Web.UI;
+@using System.Web.UI.WebControls;
+
+@model List<Microsoft.Exchange.WebServices.Data.Contact>
+<style type="text/css">
+
+input[type="submit"] {
+    margin-top: 10px;
+}
+
+.cck div {
+    float: right;
+}
+
+.dataTables_filter {
+     display: none;
+}
+
+.dataTables_paginate{
+    padding-top: 20px;
+}
+
+.dataTable th {
+    padding-bottom: 15px;
+}
+
+tr.odd {
+    background-color: #A9D0F5;
+}
+
+tr.odd td.sorting_1 {
+    background-color: #BFDBF6;
+}
+
+tr.even td.sorting_1 {
+    background-color: #E1EEFF;
+}
+
+.fancybox-nav span {
+ visibility: visible;
+}
+
+.fancybox-nav {
+    width: 10%;
+}
+
+.fancybox-close {
+	position: absolute;
+	top: -18px;
+	right: -18px;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+	z-index: 8040;
+	background-color: transparent;
+}
+
+a.fancybox-item:hover, img.fancybox-item:hover {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    z-index: 8040;
+    background-color: transparent;
+}
+
+a.fancybox-prev:hover, img.fancybox-prev:hover {
+	background-color: transparent;
+}
+
+a.fancybox-next:hover, img.fancybox-next:hover {
+	background-color: transparent;
+}
+
+Messages_processing {
+    background-color: white;
+}
+
+.multi-list 
+{
+    float: left;
+    padding-right: 50px;
+}
+
+.clear
+{
+    clear: both;
+}
+
+</style>
+
+@section scripts{
+
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/validationEngine.jquery.min.css"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/2.1.30/js/bootstrap-datetimepicker.min.js"></script>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery.ui.all.css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/2.1.30/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
+
+
+<script>
+    function Search() {
+        this.comms = [];
+        this.datefrom = "";
+        this.dateto = "";
+        this.from = "";
+        this.to = "";
+        this.subject = "";
+        this.bodytext = "";
+    }
+    $("#toggleAll").click(function () {
+        $(".csel").attr('checked', this.checked);
+    });
+
+    $(".csel").click(function () {
+        if (!this.checked) {
+            $("#toggleAll").attr('checked', false);
+        }
+        else if ($(".csel").length == $(".csel :checked").length) {
+            $("#toggleAll").attr('checked', true);
+        }
+    });
+@*    $(document).ready(function () {
+        $('#search').click(function () {
+
+            var tSearch = new Search();
+
+            $('#cc input:checked').each(function() {
+                tSearch.comms.push(this.name);
+            });
+            tSearch.datefrom = $("#datefrom").val();
+            tSearch.dateto = $("#dateto").val();
+            tSearch.from = $("#from").val();
+            tSearch.to = $("#to").val();
+            tSearch.subject = $("#subject").val();
+            tSearch.bodytext = $("bodytext").val();
+
+            var postData = JSON.stringify(tSearch);
+
+            $.ajax({
+                url: '@Url.Action("AJpost", "Archives")',
+                type: 'POST',
+                data: postData,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: qSuccess
+            });
+        });
+    });*@
+
+    $(function () {
+      $('#datefrom').datetimepicker();
+      $('#dateto').datetimepicker();
+  });
+  </script>
+
+}
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2>Search</h2>
+<hr />
+<div style="width:100%"> 
+
+@using (Html.BeginForm("AJpost", "Archives", FormMethod.Post)){
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+
+<fieldset>
+    <legend>Search fields</legend>
+    <label>Select mailboxes to search:</label>
+
+<div style="float:left;" id="cc">
+
+@{
+if (Model != null)
+{    
+    <div style="padding-bottom: 10px; border-bottom: 1px solid black;"><input type="checkbox" id="toggleAll" />Search all</div>
+
+    int itemcount = 0;
+    
+    <ul class="multi-list">
+
+    @foreach (var item in Model.OrderBy(comm => comm.DisplayName))
+    {
+        List<string> eads = new List<string>();
+        string email = null;
+        
+        if (item.EmailAddresses != null)
+        {
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress1))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress1].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress2))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress2].Address);
+            }
+
+            if (item.EmailAddresses.Contains(EmailAddressKey.EmailAddress3))
+            {
+                eads.Add(item.EmailAddresses[EmailAddressKey.EmailAddress3].Address);
+            }
+        }
+
+        foreach (string s in eads)
+        {
+            if (s.StartsWith("SMTP:", StringComparison.CurrentCulture))
+            {
+                email = s.Split(':')[1];
+            }
+
+        }
+        <li>@Html.CheckBox(email) @Html.ActionLink(item.DisplayName, "Index", "Archive", new { email = email, name=item.DisplayName}, null)</li>
+        @*<input type="checkbox" class="csel" name="comms" value="@email">@Html.ActionLink(item.DisplayName, "Index", "Archive", new { email = email, name=item.DisplayName}, null)
+        *@
+        if (Model.Count() > 4 && itemcount == (int)(Model.Count() / 2))
+        {
+                    @Html.Raw("</ul><ul class=\"multi-list\">");
+        }
+    }
+        </ul><div class="clear"></div>
+}
+}
+</div>
+    
+    
+
+<div id="msgc" style="float:left; padding-left: 25px">
+    <div style="float:right">
+        <label>Date (From):</label>
+        <div data-date="02/27/2014" data-date-format="mm/dd/yyyy HH:iip">
+        @Html.TextBox("datefrom")
+        </div>
+        <label>Date (To):</label>
+        <div data-date="02/27/2014" data-date-format="mm/dd/yyyy HH:iip">
+        @Html.TextBox("dateto")
+        </div>
+    <label>From:</label>
+        <div>
+        <input type="text" name="from"/>
+    </div>
+        <label>To:</label>
+        <div>
+        <input type="text" name="to" />
+    </div>
+        <label>Subject:</label>
+    <div>
+        <input type="text" name="subject" />
+    </div>
+    <label>Body:</label>
+        <div>
+        <input type="text" name="bodytext" />
+    </div>
+    </div>
+<div style="padding-top: 20px; vertical-align: bottom"><input style="float:left" value="Search" id="search" type="submit"/></div>
+</div>
+
+</fieldset>
+} 
+</div>
+
+

@@ -1,0 +1,196 @@
+﻿@using System.Web.Mvc.Html;
+@using System.Web.UI;
+@using System.Web.Script.Serialization;
+@*@model IEnumerable<Microsoft.Exchange.WebServices.Data.EmailMessage>*@
+
+@model Mail_WebArchiveView.Models.Search
+
+@{
+    ViewBag.Title = "Message Archive " + ViewBag.name;
+}
+
+@section scripts{
+
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="@Url.Content("~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.columnFilter.js")"></script>
+
+<link href="@Url.Content("~/Content/Site.css")" rel ="stylesheet" /> 
+<link href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery.ui.all.css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/demo_table_jui.css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        $.datepicker.regional[""].dateFormat = 'm/d/yy';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oMsgIndex = $('#Messages').dataTable({
+            "bJQueryUI": true,
+            "bServerSide": true,
+            "oLanguage": {
+                "sProcessing": "Processing <br><img src='@Url.Content("~/Content/ajax-loader.gif")'>"
+            },
+            "bProcessing": true,
+            "sAjaxSource": '@Url.Action("AjaxSearch", "Archives")',
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                /* Add some extra data to the sender */
+                aoData.push(
+                    { "name": "email", "value": "@Url.RequestContext.RouteData.Values["id"]" },
+                    { "name": "query", "value": "@Html.Raw(Json.Encode(Model))" }
+                    );
+                $.getJSON( sSource, aoData, function (json) { 
+                    /* Do whatever additional processing you want on the callback, then tell DataTables */
+                    fnCallback(json)
+                } ); },
+            //Default sort by date descending:
+            "aaSorting": [[0, "desc"]],
+            // Disable sorting on the last column:
+            "aoColumnDefs": [
+                {
+                    'aTargets': [0],
+                    'sType': "date",
+                    'sTitle': "Date/Time Received",
+                    'bSortable': false
+                },
+                {
+                    'aTargets': [1],
+                    'sTitle': "From",
+                    'bSortable': false
+                },
+                {
+                    'aTargets': [2],
+                    'sTitle': "Subject",
+                    'bSortable': false
+                },
+                {
+                    'sTitle': "View",
+                    'mRender': function (data, type, row) {
+                        return '<a class="vMsg fancybox fancybox.iframe" rel="fb" href="@Url.Action("Index", "Message")?mid=' + data + '&preview=true">Preview</a>' +
+                            '<a href="@Url.Action("Index", "Message")?mid=' + data + '&preview=false">View</a>';
+@*                        return '<a class="vMsg fancybox fancybox.iframe" rel="fb" href="@Url.Action("Index", "Message")?mid=' + data + '&email=' + @ViewBag.email + '&name=' + @ViewBag.name + '&preview=true">Preview</a>' +
+                            '<a href="@Url.Action("Index", "Message")?mid=' + data + '&email=' + @ViewBag.email + '&name=' + @ViewBag.name + '&preview=false">View</a>';*@
+                    },
+                    'aTargets': [3],
+                    'bSortable': false
+                },
+                {
+                    'sTitle': 'Export <input type="checkbox" class="csel2" id="checkall">',
+                    'aTargets': [4],
+                    'sClass': "export",
+                    'mRender': function (data, type, row) {
+                        return '<input type="checkbox" class="csel" name="msga" value="' + data + '">'
+                    },
+                    'bSortable': false
+                }
+            ],
+
+            "sPaginationType": "full_numbers",
+            "bLengthChange": false,
+            "bStateSave": true,
+            "iDisplayLength": 20
+
+        })
+            .columnFilter({
+                sPlaceHolder: "head:before",
+                aoColumns: [{ type: "date-range" },
+				            { type: "text" },
+                            { type: "text" },
+                            null,
+                            null
+                ]
+            });
+
+        $('#checkall').click(function () {
+            $('input', oMsgIndex.fnGetNodes()).attr('checked', this.checked);
+        });
+
+        //$('#export').submit(function () {
+        //    var sData = oMsgIndex.$('input').serialize();
+        //    alert("The following data would have been submitted to the server: \n\n" + sData);
+        //    return false;
+        //});
+
+        $(".vMsg[rel=fb]").fancybox({
+            fitToView: false,
+            width: '85%',
+            height: '85%',
+            autoSize: false,
+            closeClick: false,
+            openEffect: 'elastic',
+            closeEffect: 'elastic',
+            showNavArrows: true,
+            margin: [20, 60, 20, 60]
+        });
+
+        //Handle bulk zip export click:
+        $("#gete").click(function () {
+            var values = $('input[type="checkbox"].csel:checked').map(function() {
+                return $(this).val();
+            }).toArray();
+            $('#gzip').submit();
+        });
+
+        //Hanlde form submit via jquery:
+        $("#gzip").on("submit", function (event) {
+            event.preventDefault();
+
+            //Show datatables processing:
+            $("#Messages_processing").show();
+            var url = $(this).attr("action");
+            var formData = $(this).serialize();
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: JSON.stringify({ msga: values }),
+                contentType: 'application/json',
+                success: function (result) {
+
+                },
+                error: function (err, result) {
+                }
+            })
+        });
+
+    });
+
+</script>
+}
+
+<h2>Search Results: @ViewBag.name</h2>
+<div id="DivResult"></div>
+<div>
+@using (Html.BeginForm("GetMessageZip", "Message", FormMethod.Post, new { encType = "multipart/form-data", id="gzip", name = "gzip" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+
+
+<button id="gete" class="minimal" type="submit" style="float:right;margin-bottom:10px">Export Selected (.zip)</button>
+<table id="Messages" style="width:100%;margin-top:15px">
+    <thead>
+        <tr style="border-bottom: 1px solid black;">
+        <th style="width:200px;">Date Received</th>
+        <th>Filter: From</th>
+        <th>Filter: Subject</th>
+        <th></th>
+        <th></th>
+        </tr>
+        
+        <tr>
+        <th style="width:200px;">Date Received</th>
+        <th>From</th>
+        <th>Subject</th>
+        <th></th>
+        <th><input type="checkbox" class="csel" name="checkall"></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</div>

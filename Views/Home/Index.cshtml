@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <div style="width:100%;overflow:hidden;">
+
+                <div style="width:70%;float:left;">
+                <hgroup class="title">
+                <h1>Browse & Search: </h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            <p>
+                E-mail listed on this site is solely for information purposes and is listed as a service to the citizens.
+                Some e-mail may be SPAM or solicitations from outside entities and could contain inappropriate material outside of our control.
+                Attachments to e-mails the commissioners receive may display in a binary method that will appear as garbled text.
+                If you wish to view  commissioner e-mail not listed, you may do so through a public records request by contacting the  <a href="http://www.cityofgainesville.org/ClerkOfTheCommission.aspx">City of Gainesville Clerk of the Commission</a>.
+            </p>
+            </div>
+                <div style="margin-left: 75%; margin-top: 10px;">
+                    <h3>You may also be interested in:</h3>
+                    <ul>
+                        <li><a href="http://cityofgainesville.org/CityCommission.aspx">Commission Members</a></li>
+                        <li><a href="https://gainesville.legistar.com/Calendar.aspx">Commission Minutes</a></li>
+                        <li><a href="http://library.municode.com/index.aspx?clientId=10819">Municipal Code</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+}
+<ol class="round">
+    <li class="one">
+        <h5>Getting Started</h5>
+        To browse email correspondence for a particular Commissioner, click the "Browse" tab above, followed by the
+        name of the commissioner.
+    </li>
+
+    <li class="two">
+        <h5>Searching for messages</h5>
+        Message archives are searchable by date, sender, recipient, and body.
+    </li>
+
+    <li class="three">
+        <h5>Exporting messages</h5>
+        Messages may be exported individually or in bulk.
+    </li>
+    <li class="four">
+        <h5>Requesting official records</h5>
+        If you require additional assistance or need to request official email exports, please contact <a href="http://www.cityofgainesville.org/ClerkOfTheCommission.aspx">City of Gainesville Clerk of the Commission</a>.
+    </li>
+    <li class="five">
+        <h5>Email Availability</h5>
+        Emails that City Commissioners have read and processed for publication are added to the archive nightly.
+    </li>
+</ol>
+
+<hr />
+
+@Html.Action("CommissionerList", "Commissioner")

@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Commissioner Mail Archive - @ViewBag.Title</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
+
+        @Scripts.Render("~/bundles/jquery")
+        <script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.1/json3.min.js"></script>
+        <!--<script type="text/javascript" charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>-->
+  
+        @RenderSection("scripts", required: false) 
+         
+        <!-- Development by J.R. Morgan (C) 2014 -->
+        <!-- LiveAverage.com - liveaverage@gmail.com -->
+
+       
+    </head>
+    <body>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <a class="logo" href="@Url.Action("Index", "Home")"><img class="logo" src="~/Content/Logo.png" /></a>
+                    
+                </div>
+                <div class="float-right">
+                    <nav>
+                        <ul id="menu">
+                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Browse", "Index", "Commissioner")</li>
+                            <li>@Html.ActionLink("Search", "Index", "Search")</li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <div id="body">
+            @RenderSection("featured", required: false)
+            <section class="content-wrapper main-content clear-fix">
+                @RenderBody()
+            </section>
+        </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; @DateTime.Now.Year - City of Gainesville, Florida. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>      
+        
+    </body>
+</html>

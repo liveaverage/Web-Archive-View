@@ -1,0 +1,67 @@
+﻿@using System.Web.Mvc.Html;
+@using PagedList.Mvc;
+@using Microsoft.Exchange.WebServices.Data;
+@using Mail_WebArchiveView.Models;
+@*@model PagedList.IPagedList<Microsoft.Exchange.WebServices.Data.Contact>*@
+@model List<xCommissioner>
+
+
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "City Commission Listing";
+}
+
+<h2>Mayor</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.Where(comm => !string.IsNullOrWhiteSpace(comm.Title) && comm.Title.Contains("Mayor")).OrderBy(comm => comm.Name))
+{
+    string id = null;
+    id = (item.Mail).Split('@')[0];
+        
+    <li>
+    @Html.ActionLink(item.Name, "Browse", "Archives", new { id=id, name=item.Name}, null)
+    </li>    
+    break;   
+
+}
+</ul>
+
+<h2>City Commission Listing</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.Where(comm => comm.CurrentCommissioner.Contains("True") && !string.IsNullOrWhiteSpace(comm.Title) && !comm.Title.Contains("Mayor") && !comm.Title.Contains("Term")).OrderBy(comm => comm.Title).ThenBy(comm => comm.Name))
+{
+    string id = null;
+    id = (item.Mail).Split('@')[0];
+        
+    <li>
+    @Html.ActionLink(item.Name + " (" + item.Title + ") ", "Browse", "Archives", new { id=id, name=item.Name}, null)
+    </li>       
+
+}
+</ul>
+
+@if ((Model.Where(comm => comm.CurrentCommissioner.Contains("False"))).Count() > 0)
+{
+<h2>Previous Commissioners</h2>
+<ul>
+@foreach (var item in Model.Where(comm => !string.IsNullOrWhiteSpace(comm.Title) && comm.CurrentCommissioner.Contains("False")).OrderBy(comm => comm.Name))
+{
+    string id = null;
+    id = (item.Mail).Split('@')[0];
+    <li>
+    @Html.ActionLink(item.Name + " (" + item.Title + ") ", "Browse", "Archives", new { id = id, name=item.Name}, null) 
+    </li>       
+
+}
+</ul>
+}
+<br />
+@*Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))*@

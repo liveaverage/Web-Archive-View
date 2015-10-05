@@ -1,0 +1,29 @@
+﻿@using System.Web.Mvc.Html;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<Microsoft.Exchange.WebServices.Data.EmailAddress>
+
+
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "City Commission Listing";
+}
+
+<h2>City Commission Listing</h2>
+
+<ul class="round">
+
+@foreach (var item in Model.OrderBy(comm => comm.Name))
+{    
+    <li>
+    @Html.ActionLink(item.Name, "Index", "Archive", new { email = item.Address, name=item.Name}, null)
+    </li>       
+}
+
+</ul>
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))

@@ -1,0 +1,167 @@
+﻿@using System.Web.Mvc.Html;
+@model IEnumerable<Microsoft.Exchange.WebServices.Data.EmailMessage>
+
+@{
+    ViewBag.Title = "Message Archive for " + ViewBag.name;
+}
+
+@section scripts{
+<script type="text/javascript" charset="utf-8" src="@Url.Content("~/Scripts/DataTables-1.9.4/media/js/jquery.js")"></script>
+<script type="text/javascript" charset="utf-8" src="@Url.Content("~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.columnFilter.js")"></script>   
+<script type="text/javascript" charset="utf-8" src="@Url.Content("~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.js")"></script>
+<script type="text/javascript" charset="utf-8" src="@Url.Content("~/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.js")"></script>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/fancy/jquery.fancybox.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/fancy/jquery.fancybox.pack.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.js")"></script>
+<link href="~/Content/DataTables-1.9.4/media/css/demo_table_jui.css" rel="stylesheet" />
+<link href="~/Content/fancy/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
+<link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" />
+
+<style type="text/css">
+.fancybox-nav span {
+ visibility: visible;
+}
+
+.fancybox-close {
+	position: absolute;
+	top: -18px;
+	right: -18px;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+	z-index: 8040;
+	background-color: transparent;
+}
+
+a.fancybox-item:hover, img.fancybox-item:hover{
+	position: absolute;
+	top: -18px;
+	right: -18px;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+	z-index: 8040;
+	background-color: transparent;
+
+}
+.dataTables_filter {
+     display: none;
+}
+
+.dataTables_paginate{
+    padding-top: 20px;
+}
+
+.dataTable th {
+    padding-bottom: 15px;
+}
+
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.datepicker.regional[""].dateFormat = 'm/d/yy';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oMsgIndex = $('#Messages').dataTable({
+            "bJQueryUI": true,
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "Archives/AjaxArchives",
+            //Default sort by date descending:
+            "aaSorting": [[0, "desc"]],
+
+            // Disable sorting on the first column:
+            "aoColumnDefs" : [ {
+                'bSortable' : false,
+                'aTargets' : [ 3 ]
+            }],
+
+            "sPaginationType": "full_numbers",
+            "bStateSave": true,
+            "bLengthChange": false,
+            "iDisplayLength": 10
+        })
+            .columnFilter({
+                sPlaceHolder: "head:before",
+                aoColumns: [{ type: "date-range" },
+				            { type: "text" },
+                            { type: "text" },
+                            null
+                ]
+            });
+
+        $("#Refresh").click(function (e) {
+            oMsgIndex.fnDraw();
+        });
+
+        //$(".fancybox")
+        //    .attr('rel', 'fb')
+        //    .fancybox({
+        //        width: '80%',
+        //        height: '80%',
+        //        padding: 0,
+        //        margin: [20, 60, 20, 60], // Increase left/right margin
+        //        closeClick: false,
+        //        openEffect: 'elastic',
+        //        closeEffect: 'elastic',
+
+        //    });
+        $(".vMsg[rel=fb]").fancybox({
+            fitToView: false,
+            width: '85%',
+            height: '85%',
+            autoSize: false,
+            closeClick: false,
+            openEffect: 'elastic',
+            closeEffect: 'elastic',
+            showNavArrows: true,
+            margin: [20, 60, 20, 60]
+        });
+    });
+
+</script>
+}
+
+<h2>Message Index: @ViewBag.name</h2>
+<div>
+<button id="Refresh" style="float:right;" type="button">Refresh</button>
+<table id="Messages" style="width:100%;margin-top:15px">
+    <thead>
+        <tr style="border-bottom: 1px solid black;">
+        <th style="width:200px;">Date Received</th>
+        <th>Search: From</th>
+        <th>Search: Subject</th>
+        <th></th>
+        </tr>
+        
+        <tr>
+        <th style="width:200px;">Date Received</th>
+        <th>From</th>
+        <th>Subject</th>
+        <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@*@foreach (var item in Model)
+{
+       <tr>
+       <td style="width:180px;">
+            @Html.DisplayFor(modelItem => item.DateTimeReceived)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.From.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Subject)
+        </td>
+        <td>
+            <a class="vMsg fancybox fancybox.iframe" rel="fb" href="@Url.Action("Index", "Message", new { mid=item.Id.ToString(), email=ViewBag.email,  name=ViewBag.name, preview=true})">Preview</a>
+            @Html.ActionLink("View", "Index", "Message", new { mid=item.Id.ToString(), email=ViewBag.email, name=ViewBag.name, preview=false }, null)
+        </td>
+    </tr>
+    
+}*@
+        </tbody>
+</table>
+</div>
